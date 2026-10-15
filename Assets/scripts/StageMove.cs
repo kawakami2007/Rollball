@@ -3,42 +3,57 @@ using UnityEngine.InputSystem;
 
 public class StageMove : MonoBehaviour
 {
-    //ƒvƒŒƒCƒ„[‚Ì“ü—ÍiWASDA–îˆóƒL[j‚ª“ü—Í‚³‚ê‚½‚çStage‚ğ‰ñ“]‚³‚¹‚éB
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å…¥åŠ›ï¼ˆWASD, çŸ¢å°ã‚­ãƒ¼ï¼‰ãŒå…¥åŠ›ã•ã‚ŒãŸã‚‰Stageã‚’å›è»¢ã•ã›ã‚‹
     private InputAction _playerInput;
 
-    //‰ñ“]‚³‚¹‚½‚¢‘ÎÛ‚ÌƒIƒuƒWƒFƒNƒg
+    // å›è»¢ã•ã›ãŸã„å¯¾ç§°ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
     [SerializeField]
-        private GameObject _stage;
+    private GameObject _stage;
 
-    //•Ï”‚Ì’è‹`‚É‚Â‚¢‚Ä
-    //‚PDpribate <- ƒAƒNƒZƒXCüqFm3._playerInput]‚É“ü‚éƒf[ƒ^‚ğéŒ¾
-    //
-    //
-    //
-
-    // _playerInput <- •Ï”Fƒf[ƒ^‚ğ•ÛŠÇ‚·‚é” 
-    // void Start() <- ŠÖ”iƒƒ]ƒbƒgjFˆ—‚ğ“ü‚ê‚é” 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // _playerInput <- å¤‰æ•°ï¼šãƒ‡ãƒ¼ã‚¿ã‚’ä¿ç®¡ã™ã‚‹ç®±
+    // void Start() <- é–¢æ•°(ãƒ¡ã‚½ãƒƒãƒ‰)ï¼šå‡¦ç†ã‚’å…¥ã‚Œã‚‹ç®±
+    
     void Start()
     {
-        //InputiSystem‚ÌƒAƒNƒVƒ‡ƒ“ƒ}ƒbƒv‚©‚ç"Move"‚Æ‚¢‚¤–¼‘O‚ÌƒAƒNƒVƒ‡ƒ“‚ğ’T‚µ‚Äæ“¾‚·‚é
+        // InputSystem.actions.FindAction("Move") 
+        // â†‘InputSystemã®ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ãƒãƒƒãƒ—ã‹ã‚‰"Move"ã¨ã„ã†åå‰ã®ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã‚’æ¢ã—ã¦å–å¾—ã™ã‚‹
         _playerInput = InputSystem.actions.FindAction("Move");
     }
 
-    // Update is called once per frame
-    // 1ƒtƒŒ[ƒ€–ˆ‚É‚±‚ÌŠÖ”‚ªŒÄ‚Î‚ê‚é
+    // ï¼‘ãƒ•ãƒ¬ãƒ¼ãƒ æ¯ã«ã“ã®é–¢æ•°ãŒå‘¼ã°ã‚Œã‚‹
     void Update()
     {
-        // _playerInput‚Ì’l‚É‚æ‚Á‚ÄƒXƒe[ƒW‚ğ‰ñ“]‚³‚¹‚é
-        Debug.Log(_playerInput.ReadValue<Vector2>());
-        // Stage‚ğ‰ñ“]‚³‚¹‚éˆ—
-        // …•½(Horizontal)“ü—Í‚Ìæ“¾
+        // _playerInputã®å€¤ã«ã‚ˆã£ã¦ã‚¹ãƒ†ãƒ¼ã‚¸ã‚’å›è»¢ã•ã›ã‚‹
+
+        // Stageã‚’å›è»¢ã•ã›ã‚‹å‡¦ç†
+        // æ°´å¹³(horizontal)å…¥åŠ›ã®å–å¾—
         float horizontalInput = _playerInput.ReadValue<Vector2>().x;
-        // ‚’¼(Vertical)“ü—Í‚Ìæ“¾
+        // å‚ç›´(vertical)å…¥åŠ›ã®å–å¾—
         float verticalInput = _playerInput.ReadValue<Vector2>().y;
 
-        //ƒIƒuƒWƒFƒNƒg‚ğ‰ñ“]‚³‚¹‚é
-        _stage.transform.Rotate(horizontalInput,0f,verticalInput);
+        //Vector2ã®å…¥åŠ›ã‚’Vector3ã«å¤‰æ›
+        Vector3 rotation = new Vector3(horizontalInput, 0, verticalInput);
+
+        //ã‚ªã‚¤ãƒ©ãƒ¼è§’ã«å¤‰æ›
+        Quaternion tilt = Quaternion.Euler(rotation.x,0f,rotation.z);
+
+        //å¤‰æ›ã—ãŸå€¤ã‚’Rigidbodyã«æ¸¡ã™
+        _stage.GetComponent<Rigidbody>().MoveRotation(
+            _stage.GetComponent<Rigidbody>().transform.rotation * tilt);
+
+        // ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å›è»¢ã•ã›ã‚‹
+        //_stage.transform.Rotate(horizontalInput*0.2f,0f,verticalInput*0.2f);
+
     }
 }
+
+
+
+
+//ã€‡ã‚´ãƒ¼ãƒ«åˆ¤å®šã®ä½œæˆ(10:50ã¾ã§)
+//1.IsTrigeerã®åˆ¤å®šã‚’ã‚³ãƒ¼ãƒ‰ä¸Šã‹ã‚‰å–å¾—
+//2.ã™ã‚ŠæŠœã‘ãŸã‚‰Canvasã«ã‚´ãƒ¼ãƒ«ã—ãŸã‚ˆï¼ã¨ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸è¡¨ç¤º
+//ï¼ˆTextMeshProã§è¡¨ç¤ºï¼‰
+//EX1.ã‚´ãƒ¼ãƒ«æ™‚ã«éŸ³ã‚’é³´ã‚‰ãã†
+//EX2.å£ã‚’å¢—ã‚„ã—ã¦è¿·è·¯ã‚’ä½œã‚ã†
+//EX3.é€æ˜ãªå½“ãŸã‚Šåˆ¤å®šã®ã‚ã‚‹å¤©äº•ã‚’ä½œã‚ã†
